@@ -1,0 +1,209 @@
+a {
+  border: 2px solid #9d4edd;
+  border-radius: 0.25rem;
+  background-color: #161622;
+  padding: 0.25rem 0.75rem;
+  max-width: 90vw;
+  overflow-x: auto;
+  overflow-y: hidden;
+  color: #ff008a;
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-align: center;
+  white-space: nowrap;
+}
+a:hover {
+  cursor: pointer;
+}
+a::-webkit-scrollbar {
+  height: 5px;
+}
+a::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: #00f5ff;
+}
+
+button {
+  border: 2px solid #9d4edd;
+  border-radius: 0.25rem;
+  background-color: #161622;
+  padding: 0.25rem 0.75rem;
+  color: #ff008a;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+button:active {
+  background-color: #00f5ff;
+}
+button:hover {
+  background-color: #ff008a;
+  color: #161622;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #0a0a0f;
+  width: 100vw;
+  height: 100vh;
+  color: #00f5ff;
+  font-size: 1.25rem;
+  font-family: 'Space Grotesk';
+}
+
+.github {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  font-size: 2rem;
+}
+.github:hover {
+  cursor: pointer;
+  color: #ff008a;
+}
+
+h1 {
+  border: 2px solid #9d4edd;
+  border-radius: 0.75rem;
+  background-color: #161622;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  font-size: 3rem;
+  letter-spacing: 0.5rem;
+}
+h3 {
+  color: #ff008a;
+  font-size: 2rem;
+}
+
+.icon {
+  font-size: 1.75rem;
+}
+input {
+  margin-left: 1rem;
+}
+input[type='checkbox'] {
+  appearance: none;
+  border: 2px solid #9d4edd;
+  border-radius: 0.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+input[type='checkbox']:checked {
+  border-image: none;
+  background-clip: content-box;
+  background-color: #ff008a;
+  padding: 4px;
+}
+input[type='checkbox']:hover {
+  cursor: pointer;
+}
+input[type='number'] {
+  margin: 0;
+  border: none;
+  background-color: transparent;
+  width: auto;
+  max-width: 2.5rem;
+  height: 1.5rem;
+  field-sizing: content;
+  color: #fdf7ff;
+  text-align: right;
+}
+input[type='number']:focus {
+  outline-color: #9d4edd;
+}
+input[type='number']:hover,
+.icon:hover {
+  cursor: pointer;
+}
+input[type='number']::selection {
+  background-color: rgba(255, 0, 138, 0.4);
+}
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.nopassword {
+  color: #ff008a;
+}
+
+.numArrow,
+.numArrow:hover,
+.numArrow:active {
+  all: unset;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  line-height: 1;
+}
+.numArrow:hover {
+  color: #ff008a;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  width: auto;
+  height: clamp(2rem, 100%, 5rem);
+}
+.optionsMenu {
+  display: flex;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  border: 2px solid #9d4edd;
+  border-radius: 0.75rem;
+  background-color: #161622;
+  padding: 0.5rem 1rem;
+  height: 40%;
+  height: 40%;
+}
+
+.password {
+  color: #00f5ff;
+}
+
+.reset,
+.reset:hover {
+  all: unset;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 2rem;
+  line-height: 1;
+}
+.reset:hover {
+  color: #ff008a;
+}
+
+.shadow {
+  animation: shadowCycle 3s linear infinite;
+}
+.spin {
+  animation: spin360 0.6s ease-in-out;
+}
+
+@keyframes shadowCycle {
+  0%,
+  100% {
+    box-shadow: 0px 10px 10px 5px rgba(10, 10, 15, 0.5);
+  }
+  50% {
+    box-shadow: 0px 10px 10px 5px rgba(157, 78, 221, 0.5);
+  }
+}
+
+@keyframes spin360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
