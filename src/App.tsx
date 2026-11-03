@@ -33,6 +33,16 @@ export default function App() {
   )
   const [password, setPassword] = useState('')
   const handleChange = (key: keyof PasswordParams, value: number | boolean) => {
+    const checkboxOptions = ['numbers', 'symbols', 'upper', 'lower']
+
+    if (checkboxOptions.includes(key) && value === false) {
+      const selectedOptions = checkboxOptions.filter(
+        (option) => passwordParams[option as keyof PasswordParams],
+      )
+
+      if (selectedOptions.length === 1) return
+    }
+
     setPasswordParams((prev) => ({ ...prev, [key]: value }))
   }
 
