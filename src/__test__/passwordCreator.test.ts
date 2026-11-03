@@ -15,6 +15,14 @@ const characterGroups = {
   lower: 'abcdefghijklmnopqrstuvwxyz',
 }
 
+const validationParams = {
+  length: 10,
+  numbers: true,
+  symbols: true,
+  upper: true,
+  lower: true,
+}
+
 describe('passwordCreator', () => {
   for (const params of testParams) {
     it(`Respects parameters: ${JSON.stringify(params)}`, () => {
@@ -40,5 +48,67 @@ describe('passwordCreator', () => {
 
   it('tests all 15 valid checkbox combinations', () => {
     expect(testParams).toHaveLength(15)
+  })
+})
+
+describe('Password validation rejects', () => {
+  it('password lengths under 0', () => {
+    expect(() => {
+      passwordCreator({ ...validationParams, length: -1 })
+    }).toThrow(RangeError)
+  })
+
+  it('password lengths equal to 0', () => {
+    expect(() => {
+      passwordCreator({ ...validationParams, length: 0 })
+    }).toThrow(RangeError)
+  })
+
+  it('password lengths over 100', () => {
+    expect(() => {
+      passwordCreator({ ...validationParams, length: 101 })
+    }).toThrow(RangeError)
+  })
+
+  it.each([0, -1, 1.5, NaN, Infinity, -Infinity, 0x100000001])(
+    'invalid selection length: %s',
+    (length) => {
+      expect(() => {
+        passwordCreator({ ...validationParams, length: length })
+      }).toThrow(RangeError)
+    },
+  )
+
+  it('configurations without selected categories', () => {
+    expect(() => {
+      passwordCreator({
+        ...validationParams,
+        numbers: false,
+        symbols: false,
+        upper: false,
+        lower: false,
+      })
+    }).toThrow(RangeError)
+  })
+
+  it('lengths smaller than selected categories', () => {
+    expect(() => {
+      passwordCreator({ ...validationParams, length: 3 })
+    }).toThrow(RangeError)
+  })
+
+  it('unsafe integer lengths', () => {
+    expect(() => {
+      passwordCreator({
+        ...validationParams,
+        length: Number.MAX_SAFE_INTEGER + 1,
+      })
+    }).toThrow(RangeError)
+  })
+})
+
+describe('Password validation accepts', () => {
+  it('lengths equal to selected categories', () => {
+    expect(passwordCreator({ ...validationParams, length: 4 })).toHaveLength(4)
   })
 })

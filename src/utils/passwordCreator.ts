@@ -8,39 +8,57 @@ export interface PasswordParams {
   lower: boolean
 }
 
+const characterSets = {
+  numbers: '0123456789',
+  symbols: '!@#$%^&*()-_=+[]{};:,.<>/?~',
+  upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  lower: 'abcdefghijklmnopqrstuvwxyz',
+}
+
+const maxLength = 100
+
 export default function passwordCreator({
   length,
   numbers,
   symbols,
   upper,
   lower,
-}: PasswordParams) {
-  //Character definition
-  const numberValues = '0123456789'
-  const symbolValues = '!@#$%^&*()-_=+[]{};:,.<>/?~'
-  const upperValues = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  const lowerValues = 'abcdefghijklmnopqrstuvwxyz'
+}: PasswordParams): string {
+  //Password length validation
+  if (!Number.isSafeInteger(length) || length < 1 || length > maxLength) {
+    throw new RangeError(
+      `Password length must be an integer between 1 and ${maxLength}.`,
+    )
+  }
 
   //Characters to use
-  const selectedCharacters: string[] = []
+  const selectedGroups: string[] = []
 
   //Character selection
-  if (numbers) selectedCharacters.push(numberValues)
-  if (symbols) selectedCharacters.push(symbolValues)
-  if (upper) selectedCharacters.push(upperValues)
-  if (lower) selectedCharacters.push(lowerValues)
+  if (numbers) selectedGroups.push(characterSets.numbers)
+  if (symbols) selectedGroups.push(characterSets.symbols)
+  if (upper) selectedGroups.push(characterSets.upper)
+  if (lower) selectedGroups.push(characterSets.lower)
+
+  //Character validation
+  if (selectedGroups.length === 0) {
+    throw new RangeError('At least one character category must be selected.')
+  }
+  if (length < selectedGroups.length) {
+    throw new RangeError(
+      'Password length must be at least the number of selected categories.',
+    )
+  }
 
   //Select a random character of each selected group
-  const password = selectedCharacters.map(
-    (group) => group[randomNum(group.length)],
-  )
+  const password = selectedGroups.map((group) => group[randomNum(group.length)])
 
   //Combine groups
-  const allCharacters = selectedCharacters.join('')
+  const selectedCharacters = selectedGroups.join('')
 
   //Fill in remaining password slots
   while (password.length < length) {
-    password.push(allCharacters[randomNum(allCharacters.length)])
+    password.push(selectedCharacters[randomNum(selectedCharacters.length)])
   }
 
   //Shuffle characters

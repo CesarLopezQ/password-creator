@@ -7,96 +7,128 @@ import githubLink from './utils/githubLink'
 import { Tooltip } from 'react-tooltip'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import {
   faCaretLeft,
   faCaretRight,
   faRotateLeft,
 } from '@fortawesome/free-solid-svg-icons'
-import { faGithub } from '@fortawesome/free-brands-svg-icons'
 
 import './App.css'
 
+const defaultPasswordParams = {
+  length: 10,
+  numbers: true,
+  symbols: true,
+  upper: true,
+  lower: true,
+}
+
+const checkboxOptions = ['numbers', 'symbols', 'upper', 'lower']
+
 export default function App() {
-  {
-    /*Password Set*/
-  }
+  const [passwordParams, setPasswordParams] = useState(defaultPasswordParams)
 
-  const defaultPasswordParams: PasswordParams = {
-    length: 10,
-    numbers: true,
-    symbols: true,
-    upper: true,
-    lower: true,
-  }
-  const [passwordParams, setPasswordParams] = useState<PasswordParams>(
-    defaultPasswordParams,
-  )
-  const [password, setPassword] = useState('')
+  const selectedOptions = checkboxOptions.filter(
+    (option) => passwordParams[option as keyof PasswordParams],
+  ).length
   const handleChange = (key: keyof PasswordParams, value: number | boolean) => {
-    const checkboxOptions = ['numbers', 'symbols', 'upper', 'lower']
-
     if (checkboxOptions.includes(key) && value === false) {
-      const selectedOptions = checkboxOptions.filter(
-        (option) => passwordParams[option as keyof PasswordParams],
-      )
+      if (selectedOptions === 1) return
+    }
 
-      if (selectedOptions.length === 1) return
+    if (checkboxOptions.includes(key) && value === true) {
+      const newLength = Math.max(passwordParams.length, selectedOptions + 1)
+
+      setPasswordParams((prev) => ({
+        ...prev,
+        [key]: value,
+        length: newLength,
+      }))
+
+      setLengthInput(String(newLength))
+      return
     }
 
     setPasswordParams((prev) => ({ ...prev, [key]: value }))
   }
 
-  {
-    /*Submit Info*/
-  }
-  const handleClick = () => {
-    const data = passwordCreator(passwordParams)
-    setPassword(data)
+  const [lengthInput, setLengthInput] = useState(
+    String(defaultPasswordParams.length),
+  )
+  const handleLengthBlur = () => {
+    const value = Number(lengthInput)
+
+    if (lengthInput.trim() === '' || !Number.isInteger(value)) {
+      setLengthInput(String(passwordParams.length))
+      return
+    }
+
+    const validLength = Math.min(100, Math.max(selectedOptions, value))
+
+    setPasswordParams((prev) => ({
+      ...prev,
+      length: validLength,
+    }))
+
+    setLengthInput(String(validLength))
   }
 
-  {
-    /*Modify length*/
+  const [password, setPassword] = useState('')
+  const handleClick = () => {
+    try {
+      const data = passwordCreator(passwordParams)
+      setPassword(data)
+    } catch (error) {
+      if (error instanceof Error) {
+        window.alert(error.message)
+      } else {
+        window.alert('An unexpected error has occurred.')
+      }
+    }
   }
   const increaseLength = () => {
+    const newLength = Math.min(100, passwordParams.length + 1)
+
     setPasswordParams((prev) => ({
       ...prev,
-      length: Math.min(100, prev.length + 1),
+      length: newLength,
     }))
-  }
 
+    setLengthInput(String(newLength))
+  }
   const decreaseLength = () => {
+    const newLength = Math.max(selectedOptions, passwordParams.length - 1)
     setPasswordParams((prev) => ({
       ...prev,
-      length: Math.max(1, prev.length - 1),
+      length: newLength,
     }))
+
+    setLengthInput(String(newLength))
   }
 
-  {
-    /*Spin Reset Button*/
-  }
   const [isSpinning, setIsSpinning] = useState(false)
   const spinButton = () => {
     setIsSpinning(true)
   }
 
-  {
-    /*Password Visibility*/
-  }
   const [hidden, setHidden] = useState(true)
   const hiddenPassword = () => {
-    if (hidden) {
-      return '**********'
-    } else {
-      return password
-    }
+    return hidden ? '*'.repeat(password.length) : password
   }
 
-  {
-    /*Tooltip*/
+  const handleReset = () => {
+    setPasswordParams(defaultPasswordParams)
+    setLengthInput(String(defaultPasswordParams.length))
+    setPassword('')
+    spinButton()
+    setHidden(true)
   }
+
   const beforeCopy = 'Copy Password'
   const afterCopy = 'Password Copied!'
-  const [tooltip, setTooltip] = useState(false)
+  const copyFailed = 'Could not copy password.'
+  const [tooltip, setTooltip] = useState(beforeCopy)
 
   return (
     <div className="container">
@@ -123,18 +155,7 @@ export default function App() {
             data-tooltip-id="reset"
             data-tooltip-content="Reset"
             data-tooltip-place="top"
-            onClick={() => {
-              spinButton()
-              setPassword('')
-              setPasswordParams({
-                length: 10,
-                numbers: true,
-                symbols: true,
-                upper: true,
-                lower: true,
-              })
-              setHidden(true)
-            }}
+            onClick={handleReset}
           >
             <FontAwesomeIcon
               icon={faRotateLeft}
@@ -144,7 +165,7 @@ export default function App() {
           </button>
           <label
             data-tooltip-id="length"
-            data-tooltip-content="Min: 1 / Max: 100"
+            data-tooltip-content={`Min: ${selectedOptions} / Max: 100`}
             data-tooltip-place="top"
           >
             Password Length:
@@ -155,11 +176,12 @@ export default function App() {
           <input
             type="number"
             name="length"
-            min={1}
+            min={selectedOptions}
             max={100}
-            value={passwordParams.length}
+            value={lengthInput}
             onFocus={(e) => e.currentTarget.select()}
-            onChange={(e) => handleChange('length', e.target.valueAsNumber)}
+            onChange={(e) => setLengthInput(e.target.value)}
+            onBlur={handleLengthBlur}
           />{' '}
           <button className="numArrow" onClick={increaseLength}>
             <FontAwesomeIcon icon={faCaretRight} className="icon" />
@@ -168,13 +190,7 @@ export default function App() {
 
         {/*Password Params: numbers*/}
         <div className="option">
-          <label
-            data-tooltip-id="numbers"
-            data-tooltip-content="0-9"
-            data-tooltip-place="top"
-          >
-            Require numbers:
-          </label>
+          <label>Require numbers:</label>
           <input
             type="checkbox"
             name="numbers"
@@ -185,13 +201,7 @@ export default function App() {
 
         {/*Password Params: symbols*/}
         <div className="option">
-          <label
-            data-tooltip-id="symbols"
-            data-tooltip-content="!@#$%^&*()-_=+[]{};:,.<>/?~"
-            data-tooltip-place="top"
-          >
-            Require symbols:
-          </label>
+          <label>Require symbols:</label>
           <input
             type="checkbox"
             name="symbols"
@@ -244,28 +254,28 @@ export default function App() {
       </button>
 
       {/*Show Password*/}
-      <a
+      <button
         className={`shadow ${password ? 'nopassword' : 'password'}`}
         data-tooltip-id="password"
-        data-tooltip-content={tooltip ? afterCopy : beforeCopy}
+        data-tooltip-content={tooltip}
         data-tooltip-place="top"
         onMouseLeave={() =>
           setTimeout(() => {
-            setTooltip(false)
+            setTooltip(beforeCopy)
           }, 500)
         }
-        onClick={() => {
-          void handleCopy(password)
-          setTooltip(true)
+        onClick={async () => {
+          if (!password) return
+
+          const copied = await handleCopy(password)
+          setTooltip(copied ? afterCopy : copyFailed)
         }}
       >
         {password ? hiddenPassword() : '**********'}
-      </a>
+      </button>
 
       <Tooltip id="password" />
       <Tooltip id="length" />
-      <Tooltip id="numbers" />
-      <Tooltip id="symbols" />
       <Tooltip id="hide" />
       <Tooltip id="reset" />
       <Tooltip id="github" />
